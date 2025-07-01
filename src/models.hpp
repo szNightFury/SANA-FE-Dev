@@ -282,13 +282,11 @@ public:
     void set_attribute_hw(const std::string &attribute_name, const ModelAttribute &param) override {};
     void set_attribute_neuron(size_t neuron_address, const std::string &attribute_name, const ModelAttribute &param) override;
     PipelineResult update(size_t neuron_address, std::optional<double> current_in = std::nullopt) override;
-    void reset() override { send_spike = false;
-    }
+    void reset() override {}
 
 private:
     static inline const std::set<std::string> input_attributes{"rate", "poisson", "spikes"};
     std::vector<bool> spikes;
-    std::vector<bool>::const_iterator curr_spike{spikes.begin()};
     std::uniform_real_distribution<double> uniform_distribution{0.0, 1.0};
     // Intentionally use a fixed seed to get deterministic results across runs
     // To truly randomize, use:

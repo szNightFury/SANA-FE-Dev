@@ -20,6 +20,32 @@ Example:
     >>> dense1 = layers.Dense(net, conv1, 128, dense_weights)
 """
 
+# --- Helper function to separate arguments ---
+def _separate_create_group_kwargs(kwargs):
+    """
+    Separates the specific keyword arguments for snn.create_neuron_group
+    from the general model_attributes dictionary. This is the correct
+    and robust way to handle the parameters.
+    """
+    # All possible keyword arguments for create_neuron_group, besides the mandatory ones.
+    known_keys = [
+        'soma_hw_name', 'default_synapse_hw_name', 'default_dendrite_hw_name',
+        'force_synapse_update', 'force_dendrite_update', 'force_soma_update',
+        'log_spikes', 'log_potential'
+    ]
+    
+    # Extract the known arguments into their own dictionary.
+    group_specific_kwargs = {}
+    for key in known_keys:
+        if key in kwargs:
+            group_specific_kwargs[key] = kwargs.pop(key)
+            
+    # The remaining kwargs are treated as model_attributes.
+    model_attributes = kwargs
+    
+    return group_specific_kwargs, model_attributes
+
+
 class Layer:
     """
     Base class for all neural network layers.
@@ -129,16 +155,17 @@ class Input2D(Layer):
 
         if width <= 0 or height <= 0 or channels <= 0:
             raise ValueError("Width, height, and channels must be positive")
+        
+        self.width, self.height, self.channels = width, height, channels
 
-        neuron_count = width * height * channels
-        self.width = width
-        self.height = height
-        self.channels = channels
+        # Separate arguments for create_neuron_group.
+        group_kwargs, model_attrs = _separate_create_group_kwargs(kwargs)
 
         self.group = snn.create_neuron_group(
             f"input_{Input2D._count}",
-            neuron_count,
-            model_attributes=kwargs
+            width * height * channels,
+            model_attributes=model_attrs,
+            **group_kwargs
         )
 
         Input2D._count += 1
@@ -173,7 +200,7 @@ class Conv2D(Layer):
 
     _count = 0
 
-    def __init__(self, snn, prev_layer, weights, stride_width=1,
+    def __init__(self, snn, prev_layer, weights, biases=None, stride_width=1,
                  stride_height=1, pad_width=0, pad_height=0, **kwargs):
         """
         Create 2D convolutional layer.
@@ -184,6 +211,9 @@ class Conv2D(Layer):
             weights (np.ndarray): 4D weight tensor with shape (W, H, C_in, C_out)
                 where W=kernel width, H=kernel height, C_in=input channels,
                 C_out=output channels
+            biases (np.ndarray, optional): Bias for each output channel.
+                If provided, must be a 1D array of length C_out.
+                Defaults to None (no bias).
             stride_width (int, optional): Horizontal stride. Defaults to 1.
             stride_height (int, optional): Vertical stride. Defaults to 1.
             pad_width (int, optional): Horizontal padding. Defaults to 0.
@@ -201,6 +231,9 @@ class Conv2D(Layer):
                 "Expected weights kernel with 4 dimensions in the "
                 "order 'WHCN' (Width, Height, Channels_in, Channels_out)"
             )
+        
+        if biases is not None and biases.ndim != 1 and len(biases) != weights.shape[3]:
+            raise ValueError("Bias must be a 1D array with length equal to output channels")
 
         if stride_width <= 0 or stride_height <= 0:
             raise ValueError("Stride values must be positive")
@@ -226,20 +259,30 @@ class Conv2D(Layer):
                            stride_height)
         self.channels = filter_count
 
+        # Separate arguments for create_neuron_group.
+        group_kwargs, model_attrs = _separate_create_group_kwargs(kwargs)
+
         if self.width <= 0 or self.height <= 0:
             raise ValueError(
                 f"Invalid output dimensions ({self.width}x{self.height}). "
                 "Check kernel size, stride, and padding parameters."
             )
 
-        neuron_count = self.width * self.height * self.channels
-
         # Create neuron group with user-specified parameters
         self.group = snn.create_neuron_group(
             f"conv2d_{Conv2D._count}",
-            neuron_count,
-            model_attributes=kwargs
+            self.width * self.height * self.channels,
+            model_attributes=model_attrs,
+            **group_kwargs
         )
+
+        # Apply bias if provided
+        if biases is not None:
+            neurons_per_channel = self.width * self.height
+            for i in range(self.channels):
+                 for neuron_idx in range(i * neurons_per_channel, (i + 1) * neurons_per_channel):
+                    self.group[neuron_idx].set_attributes(model_attributes={'bias': biases[i]})
+
 
         # Connect to previous layer with convolutional connectivity
         attributes = {"w": weights_flat}
@@ -311,11 +354,15 @@ class Dense(Layer):
                 f"shape {expected_shape} for connection from {len(prev_layer)} "
                 f"to {neuron_count} neurons"
             )
+        
+        # Separate arguments for create_neuron_group.
+        group_kwargs, model_attrs = _separate_create_group_kwargs(kwargs)
 
         self.group = snn.create_neuron_group(
             f"dense_{Dense._count}",
             neuron_count,
-            model_attributes=kwargs
+            model_attributes=model_attrs,
+            **group_kwargs
         )
 
         # Connect with dense connectivity pattern

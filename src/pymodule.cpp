@@ -1354,8 +1354,8 @@ PYBIND11_MODULE(sanafecpp, m)
                     pybind11::arg("force_dendrite_update") = pybind11::none(),
                     pybind11::arg("force_soma_update") = pybind11::none(),
                     pybind11::arg("model_attributes") = pybind11::dict(),
-                    pybind11::arg("soma_attributes") = pybind11::dict(),
-                    pybind11::arg("dendrite_attributes") = pybind11::dict())
+                    pybind11::arg("dendrite_attributes") = pybind11::dict(),
+                    pybind11::arg("soma_attributes") = pybind11::dict())
             .def(
                     "connect_to_neuron",
                     [](const PyNeuronRef &ref, const PyNeuronRef &dest_ref,

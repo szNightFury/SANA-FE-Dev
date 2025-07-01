@@ -840,7 +840,6 @@ void sanafe::InputModel::set_attribute_neuron(const size_t /*neuron_address*/,
     {
         spikes = static_cast<std::vector<bool>>(param);
         TRACE1(MODELS, "Setting input spike train (len:%zu)\n", spikes.size());
-        curr_spike = spikes.begin();
     }
     else if (attribute_name == "poisson")
     {
@@ -878,10 +877,8 @@ sanafe::PipelineResult sanafe::InputModel::update(
     }
 
     bool send_spike = false;
-    if (curr_spike != spikes.end())
-    {
-        send_spike = *curr_spike;
-        curr_spike = std::next(curr_spike);
+    if (simulation_time > 0 && static_cast<size_t>(simulation_time) <= spikes.size()) {
+        send_spike = spikes[static_cast<size_t>(simulation_time - 1)];
     }
 
     if (poisson_probability > uniform_distribution(gen))
