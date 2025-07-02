@@ -436,9 +436,23 @@ sanafe::NeuronGroup &pycreate_neuron_group(sanafe::SpikingNetwork *self,
     default_neuron_config.log_spikes = log_spikes;
     default_neuron_config.soma_hw_name = std::move(soma_hw_name);
 
+    if (model_dict.contains("soma")) {
+        pybind11::dict soma_dict = model_dict["soma"].cast<pybind11::dict>();
+        auto soma_attributes = pydict_to_model_attributes(soma_dict, false, false, true);
+        default_neuron_config.model_attributes.insert(soma_attributes.begin(), soma_attributes.end());
+        model_dict.attr("pop")("soma");
+    }
+
+    if (model_dict.contains("dendrite")) {
+        pybind11::dict dendrite_dict = model_dict["dendrite"].cast<pybind11::dict>();
+        auto dendrite_attributes = pydict_to_model_attributes(dendrite_dict, false, true, false);
+        default_neuron_config.model_attributes.insert(dendrite_attributes.begin(), dendrite_attributes.end());
+        model_dict.attr("pop")("dendrite");
+    }
+
     std::map<std::string, sanafe::ModelAttribute> model_attributes =
             pydict_to_model_attributes(model_dict);
-    default_neuron_config.model_attributes = std::move(model_attributes);
+    default_neuron_config.model_attributes.insert(model_attributes.begin(), model_attributes.end());
 
     return self->create_neuron_group(
             group_name, neuron_count, default_neuron_config);

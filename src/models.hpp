@@ -199,7 +199,7 @@ public:
 private:
     static inline const std::set<std::string> loihi_lif_attributes{"reset_mode",
             "reverse_reset_mode", "reset", "reverse_reset", "bias", "threshold",
-            "reverse_threshold", "leak_decay", "noise"};
+            "reverse_threshold", "leak_decay", "input_decay", "noise"};
     std::vector<LoihiCompartment> compartments{loihi_max_compartments};
     NoiseType noise_type{noise_none};
     std::ifstream noise_stream;

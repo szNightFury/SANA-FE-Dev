@@ -39,9 +39,18 @@ def _separate_create_group_kwargs(kwargs):
     for key in known_keys:
         if key in kwargs:
             group_specific_kwargs[key] = kwargs.pop(key)
+
+    # Look for specific attribute dictionaries
+    soma_attrs = kwargs.pop('soma', {})
+    dendrite_attrs = kwargs.pop('dendrite', {})
             
     # The remaining kwargs are treated as model_attributes.
     model_attributes = kwargs
+
+    if soma_attrs:
+        model_attributes['soma'] = soma_attrs
+    if dendrite_attrs:
+        model_attributes['dendrite'] = dendrite_attrs
     
     return group_specific_kwargs, model_attributes
 

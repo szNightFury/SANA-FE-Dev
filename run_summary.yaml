@@ -1,0 +1,18 @@
+build_git_version: 'baf813c4daff5b6a2cd1eac774f5d95068679604'
+timesteps_executed: 100
+total_spikes: 50
+total_messages_sent: 50
+total_neurons_updated: 400
+total_neurons_fired: 133
+sim_time: 5.900000e-06
+energy:
+  synapse:1.000000e-09
+  dendrite:0.000000e+00
+  soma:4.549000e-08
+  network: 0.000000e+00
+  total: 5.149000e-08
+wall_time:
+  neuron_processing: 1.331673
+  message_processing: 1.253257
+  scheduler: 0.000582
+  energy: 0.000365

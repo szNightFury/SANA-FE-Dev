@@ -4,10 +4,7 @@ release/
 etc/
 dist/
 sanafe.egg-info/
-tutorial/dvs_challenge.net
-tutorial/loihi.yaml
 *.swp
-*.yaml
 *.png
 *.npz
 *.parsed

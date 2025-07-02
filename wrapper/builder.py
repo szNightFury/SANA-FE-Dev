@@ -1,5 +1,6 @@
-from sanafe.layers import *
+from .layers import *
 import numpy as np
+
 
 def create_snn(snn, arch, input_data, conv_layers_config, **kwargs):
     """
@@ -32,8 +33,23 @@ def create_snn(snn, arch, input_data, conv_layers_config, **kwargs):
 
     for i, conv_config in enumerate(conv_layers_config):
         # Separate kwargs for the conv layer using prefixes.
-        conv_kwargs = {k.replace(f'conv{i}_', ''): v for k, v in kwargs.items() if k.startswith(f'conv{i}_')}
-        
+        conv_kwargs = {}
+        prefix = f'conv{i}_'
+
+        for k, v in kwargs.items():
+            if not k.startswith(prefix):
+                continue
+            key = k[len(prefix):]
+
+            if key.startswith('soma_') and key != 'soma_hw_name':
+                sub_key = key[len('soma_'):]
+                conv_kwargs.setdefault('soma', {})[sub_key] = v
+            elif key.startswith('dendrite_') and key != 'dendrite_hw_name':
+                sub_key = key[len('dendrite_'):]
+                conv_kwargs.setdefault('dendrite', {})[sub_key] = v
+            else:
+                conv_kwargs[key] = v
+
         # Get weights and biases from the config
         weights = conv_config['weights']
         biases = conv_config.get('biases') # It's optional

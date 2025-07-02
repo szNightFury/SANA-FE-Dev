@@ -234,6 +234,9 @@ if(PYTHON_BUILD_ENABLED)
         sanafecpp
         ${SOURCE_FILES}
     )
+    set_target_properties(sanafecpp PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/wrapper"
+    )
 
     target_link_libraries(sanafecpp PRIVATE ${PYTHON_LIBRARIES})
     target_link_libraries(sanafecpp PRIVATE pybind11::pybind11)

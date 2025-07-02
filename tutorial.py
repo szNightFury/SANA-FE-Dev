@@ -1,5 +1,5 @@
 import sanafe
-import sanafe.layers
+import wrapper.layers
 
 arch = sanafe.load_arch("arch/loihi.yaml")
 snn = sanafe.Network()
