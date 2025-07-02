@@ -305,7 +305,9 @@ class Conv2D(Layer):
             kernel_height,
             filter_count,
             stride_width,
-            stride_height
+            stride_height,
+            pad_width,
+            pad_height
         )
 
         Conv2D._count += 1

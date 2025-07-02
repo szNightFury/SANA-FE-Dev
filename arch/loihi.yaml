@@ -33,6 +33,28 @@ architecture:
               attributes:
                 energy_message_in: 0.0e-12
                 latency_message_in: 16.0e-9
+          synapse:
+            - name: loihi_conv_synapse
+              attributes:
+                model: current_based
+                latency_process_spike: 3.1e-9
+                energy_process_spike: 24.0e-12
+            - name: loihi_dense_synapse
+              attributes:
+                model: current_based
+                energy_process_spike: 35.5e-12
+                latency_process_spike: 3.8e-9
+            - name: loihi_sparse_synapse
+              attributes:
+                model: current_based
+                energy_process_spike: 33.6e-12
+                latency_process_spike: 4.7e-9
+          dendrite:
+          - name: loihi_dendrites
+            attributes:
+              model: accumulator
+              energy_update: 0.0
+              latency_update: 0.0
           soma:
             - name: loihi_lif
               attributes:
@@ -52,32 +74,6 @@ architecture:
                 latency_update_neuron: 0.0
                 energy_spike_out: 0.0
                 latency_spike_out: 0.0
-          synapse:
-            - name: loihi_dense_synapse  # Use the name to link
-              attributes:
-                model: current_based
-                energy_process_spike: 35.5e-12
-                latency_process_spike: 3.8e-9
-            - name: loihi_sparse_synapse
-              attributes:
-                model: current_based
-                energy_process_spike: 33.6e-12
-                latency_process_spike: 4.7e-9
-                # model: loihi
-                # latency_concurrent_access: 4.7e-9
-                #
-            - name: loihi_conv_synapse
-              attributes:
-                model: current_based
-                latency_process_spike: 3.1e-9
-                energy_process_spike: 24.0e-12
-                #model: loihi
-          dendrite:
-          - name: loihi_dendrites
-            attributes:
-              model: accumulator
-              energy_update: 0.0
-              latency_update: 0.0
           axon_out:
             - name: loihi_out
               attributes:

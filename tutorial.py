@@ -1,8 +1,8 @@
-import sanafe
-import wrapper.layers
+from .wrapper.layers import Input2D, Conv2D, Dense
+from .wrapper.sanafecpp import load_arch, Network, SpikingChip
 
-arch = sanafe.load_arch("arch/loihi.yaml")
-snn = sanafe.Network()
+arch = load_arch("arch/loihi.yaml")
+snn = Network()
 
 # Load the convolutional kernel weights, thresholds and input biases from file.
 # If using the Docker container, this file is included in the image.
@@ -27,13 +27,13 @@ Or go directly to the drive at: https://drive.google.com/drive/folders/1GzjXAFou
 thresholds = snn_attributes["thresholds"]
 biases = snn_attributes["inputs"]
 
-layer0 = sanafe.layers.Input2D(snn, 32, 32, threshold=thresholds[0])
-layer1 = sanafe.layers.Conv2D(snn, layer0, snn_attributes["conv1"],
-                              stride_width=2, stride_height=2, threshold=thresholds[1])
-layer2 = sanafe.layers.Conv2D(snn, layer1, snn_attributes["conv2"], threshold=thresholds[2])
-layer3 = sanafe.layers.Conv2D(snn, layer2, snn_attributes["conv3"], threshold=thresholds[3])
-layer4 = sanafe.layers.Conv2D(snn, layer3, snn_attributes["conv4"], threshold=thresholds[4])
-layer5 = sanafe.layers.Dense(snn, layer4, 11, snn_attributes["dense1"], threshold=thresholds[5])
+layer0 = Input2D(snn, 32, 32, threshold=thresholds[0])
+layer1 = Conv2D(snn, layer0, snn_attributes["conv1"],
+                stride_width=2, stride_height=2, threshold=thresholds[1])
+layer2 = Conv2D(snn, layer1, snn_attributes["conv2"], threshold=thresholds[2])
+layer3 = Conv2D(snn, layer2, snn_attributes["conv3"], threshold=thresholds[3])
+layer4 = Conv2D(snn, layer3, snn_attributes["conv4"], threshold=thresholds[4])
+layer5 = Dense(snn, layer4, 11, snn_attributes["dense1"], threshold=thresholds[5])
 
 # Finally set up the inputs
 for n, b in zip(layer0, biases):
@@ -81,7 +81,7 @@ map_layer_to_cores(layer5, cores, layer_mapped_core_counts[5])
 
 # Run the network you just generated on Loihi
 # Comment out this line if you want to stop the simulations running
-chip = sanafe.SpikingChip(arch)
+chip = SpikingChip(arch)
 chip.load(snn)
 results = chip.sim(4)
 

@@ -391,7 +391,7 @@ void pyconnect_neurons_conv2d(sanafe::NeuronGroup *self,
         sanafe::NeuronGroup &dest_group, const pybind11::dict attributes,
         int input_width, int input_height, int input_channels, int kernel_width,
         int kernel_height, int kernel_count, int stride_width,
-        int stride_height)
+        int stride_height, int pad_width, int pad_height)
 {
     const std::map<std::string, std::vector<sanafe::ModelAttribute>>
             attribute_lists = pydict_to_attribute_lists(attributes);
@@ -406,6 +406,9 @@ void pyconnect_neurons_conv2d(sanafe::NeuronGroup *self,
 
     config.stride_width = stride_width;
     config.stride_height = stride_height;
+
+    config.pad_width = pad_width;
+    config.pad_height = pad_height;
 
     self->connect_neurons_conv2d(dest_group, attribute_lists, config);
 }
@@ -1250,7 +1253,9 @@ PYBIND11_MODULE(sanafecpp, m)
                     pybind11::arg("kernel_height"),
                     pybind11::arg("kernel_count") = 1,
                     pybind11::arg("stride_width") = 1,
-                    pybind11::arg("stride_height") = 1)
+                    pybind11::arg("stride_height") = 1,
+                    pybind11::arg("pad_width") = 0,
+                    pybind11::arg("pad_height") = 0)
             .def_property_readonly(
                     "neurons",
                     [](pybind11::object &self_obj) -> pybind11::object {

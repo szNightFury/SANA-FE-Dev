@@ -57,6 +57,8 @@ struct Conv2DParameters
     int kernel_count{1};
     int stride_width{1};
     int stride_height{1};
+    int pad_width{0};
+    int pad_height{0};
 };
 
 struct Conv2DCoordinate
@@ -79,6 +81,8 @@ struct Conv2DPosition
 {
     Conv2DCoordinate output_coordinate;
     int c_in;
+    int y_pos;
+    int x_pos;
     int y_filter;
     int x_filter;
 };
@@ -137,7 +141,7 @@ public:
 private:
     static Conv2DOutputDimensions conv2d_calculate_dimensions(const Conv2DParameters &convolution);
     void conv2d_validate_neuron_counts(const NeuronGroup &dest_group, const Conv2DOutputDimensions &dims) const;
-    static Conv2DIndices conv2d_calculate_indices(const Conv2DParameters &convolution, const Conv2DOutputDimensions &dims, const Conv2DPosition &position);
+    static Conv2DIndices conv2d_calculate_indices(const Conv2DParameters &convolution, const Conv2DOutputDimensions &dims, const Conv2DPosition &pos);
     static bool conv2d_is_position_valid(int position, int max_size) noexcept;
     void conv2d_create_output_neuron_connections(NeuronGroup &dest_group, const std::map<std::string, std::vector<ModelAttribute>> &attribute_lists, const Conv2DParameters &convolution, const Conv2DOutputDimensions &dims, const Conv2DCoordinate &out);
     void conv2d_create_kernel_connections(Neuron &dest, const std::map<std::string, std::vector<ModelAttribute>> &attribute_lists, const Conv2DParameters &convolution, const Conv2DOutputDimensions &dims, const Conv2DCoordinate &out, int c_in);

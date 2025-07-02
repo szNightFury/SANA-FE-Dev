@@ -12,7 +12,7 @@ energy:
   network: 0.000000e+00
   total: 5.149000e-08
 wall_time:
-  neuron_processing: 1.331673
-  message_processing: 1.253257
-  scheduler: 0.000582
-  energy: 0.000365
+  neuron_processing: 1.306074
+  message_processing: 1.316102
+  scheduler: 0.000928
+  energy: 0.000477
